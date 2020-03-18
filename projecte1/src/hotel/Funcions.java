@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 import com.toedter.calendar.JCalendar;
 
@@ -14,11 +17,44 @@ public class Funcions{
 	
 	public static boolean regexDNI(String dni) {
 		
-		if (dni.matches("[0-9]{8}[A-Z a-z]")) {			
-			return true;			
-		}
-		
-		return false;
+	    boolean correcte = false;
+
+	    Pattern pattern = Pattern.compile("(\\d{1,8})([TRWAGMYFPDXBNJZSQVHLCKEtrwagmyfpdxbnjzsqvhlcke])");
+
+	    Matcher matcher = pattern.matcher(dni);
+
+	    if (matcher.matches()) {
+
+	        String lletra = matcher.group(2);
+
+	        String lletres = "TRWAGMYFPDXBNJZSQVHLCKE";
+
+	        int index = Integer.parseInt(matcher.group(1));
+
+	        index = index % 23;
+
+	        String reference = lletres.substring(index, index + 1);
+
+
+
+	        if (reference.equalsIgnoreCase(lletra)) {
+
+	        	correcte = true;
+
+	        } else {
+
+	        	correcte = false;
+
+	        }
+
+	    } else {
+
+	        correcte = false;
+
+	    }
+
+	    return correcte;
+
 		
 	}
 
