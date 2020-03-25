@@ -1,4 +1,4 @@
-package hotel;
+package vista;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.time.LocalDate;
+import java.util.Calendar;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -13,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -24,17 +27,18 @@ import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
 
-import hotel.classes.Clients;
-import hotel.classes.Hotels;
-import hotel.classes.Reserves;
+import controller.Controller;
+import model.*;
+
 
 public class Finestra extends JFrame{
 	
-    Hotels hotel = new Hotels("	oasis escondidio baobat totem anantra abani bless");    
+       
 	
     JPanel panell1,panell2,panell3;
     JLabel Jltitol1, jlreservespendents, jlreservesconfirmades, Jltitol2,jldni, jlnom, jlcognoms, jlnumpersones, jlnumnits, jldata, Jltitol3, jlnomhotel,
-    jlregistrenovahabitacio,jlnumhabitacionova, jlnumpersoneshabitacio, jlconsultareserva, jlreservanomclient, jletiquetadni, icona1, icona2, icona3, icona4, icona5 ; 
+    jlregistrenovahabitacio,jlnumhabitacionova, jlnumpersoneshabitacio, jlconsultareserva, jlreservanomclient, jletiquetadni, icona1, icona2, icona3, icona4, icona5,
+    icona1p3, icona2p3 ; 
     JTextField jtdni,jtnom, jtcognoms, jtnumnits,jtfnomhotel, jtfnumhabitacionova, jtfnumpersoneshabitacio, jtfreservanomclient, jtnumpersones;
 
     JCalendar jccalendari;
@@ -44,26 +48,31 @@ public class Finestra extends JFrame{
     JTable taula1, taula2;    
     DefaultListModel<String> llistamodel1, llistamodel2;
     JList<String> jlconsultareservaclient2,jlconsultareservaclient1 ;
-    JScrollPane taulascroll1, taulascroll2, llistrascroll1, llistrascroll2;    
+    JScrollPane taulascroll1, taulascroll2, llistrascroll1, llistrascroll2;
+    
+    Controller c = new Controller();    
+    boolean clientregistrat;
+    
 
 	
-	boolean camp1, camp2, camp3, camp4, camp5;
+	boolean camp1, camp2, camp3, camp4, camp5, camp1p3, camp2p3;
     
     public Finestra() {   	
         this.setVisible(true);
         this.getContentPane().setBackground(Color.BLACK);
         this.setSize(1200, 700);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setTitle(hotel.getNomhotel());
+        this.setTitle("Oasis");
         this.setLocationRelativeTo(null);
         this.setLayout(null);
-        mostrarComponents();    	
+        mostrarComponents();
     }
 
 	private void mostrarComponents() {
 		
 		posarPanells();
 		muntarFinestra();
+		Controller.posarHabitacions(c.getHotel());
 	
 	}
 
@@ -120,7 +129,7 @@ public class Finestra extends JFrame{
 		Jltitol1.setBounds(0,0, 397, 75);
 		Jltitol1.setFont(new Font("Arial", Font.BOLD, 22));
 		Jltitol1.setHorizontalAlignment(SwingConstants.CENTER);
-		Jltitol1.setText("GestiÃ³");
+		Jltitol1.setText("Gestió");
 		panell1.add(Jltitol1);
 		
 		//Reserves
@@ -274,6 +283,7 @@ public class Finestra extends JFrame{
 		
 		jccalendari = new JCalendar();
 		jccalendari.setBounds(30, 280, 330, 250);
+		jccalendari.setMinSelectableDate(Calendar.getInstance().getTime());
 		panell2.add(jccalendari);
 		
 		jbreserva = new JButton("Reserva");
@@ -295,7 +305,7 @@ public class Finestra extends JFrame{
 				
 				if (e.getComponent().getName().equalsIgnoreCase("jtdni")){		
 					
-					if(Funcions.regexDNI(jtdni.getText())){
+					if(Controller.regexDNI(jtdni.getText())){
 						icona1.setIcon(creariconasi());
 						camp1 = true;
 						
@@ -305,7 +315,7 @@ public class Finestra extends JFrame{
 						icona1.setIcon(creariconano());
 					}
 					
-					if(Funcions.habilitarBotoPanell2(camp1,camp2,camp3,camp4,camp5)){
+					if(Controller.habilitarBotoPanell2(camp1,camp2,camp3,camp4,camp5)){
 						jbreserva.setEnabled(true);
 						panell2.add(jbreserva);
 					}
@@ -316,7 +326,7 @@ public class Finestra extends JFrame{
 				}
 				else if(e.getComponent().getName().equalsIgnoreCase("jtnom")) {
 					
-					if(Funcions.regexNom(jtnom.getText())) {						
+					if(Controller.regexNom(jtnom.getText())) {						
 						icona2.setIcon(creariconasi());
 						camp2 = true;
 					}
@@ -324,7 +334,7 @@ public class Finestra extends JFrame{
 						icona2.setIcon(creariconano());
 						camp2 = false;
 					}
-					if(Funcions.habilitarBotoPanell2(camp1,camp2,camp3,camp4,camp5)){
+					if(Controller.habilitarBotoPanell2(camp1,camp2,camp3,camp4,camp5)){
 						jbreserva.setEnabled(true);
 						panell2.add(jbreserva);
 					}
@@ -335,7 +345,7 @@ public class Finestra extends JFrame{
 					
 				}
 				else if(e.getComponent().getName().equalsIgnoreCase("jtcognoms")) {
-					if(Funcions.regexCognoms(jtcognoms.getText())) {						
+					if(Controller.regexCognoms(jtcognoms.getText())) {						
 						icona3.setIcon(creariconasi());
 						camp3 = true;
 					}
@@ -343,7 +353,7 @@ public class Finestra extends JFrame{
 						icona3.setIcon(creariconano());
 						camp3 = true;
 					}
-					if(Funcions.habilitarBotoPanell2(camp1,camp2,camp3,camp4,camp5)){
+					if(Controller.habilitarBotoPanell2(camp1,camp2,camp3,camp4,camp5)){
 						jbreserva.setEnabled(true);
 						panell2.add(jbreserva);
 					}
@@ -353,7 +363,7 @@ public class Finestra extends JFrame{
 					}
 				}
 				else if(e.getComponent().getName().equalsIgnoreCase("jtnumpersones")) {
-					if(Funcions.regexNumPersones(jtnumpersones.getText())) {
+					if(Controller.regexNumPersones(jtnumpersones.getText())) {
 						icona4.setIcon(creariconasi());
 						camp4= true;
 					}
@@ -361,7 +371,7 @@ public class Finestra extends JFrame{
 						icona4.setIcon(creariconano());
 						camp4= false;
 					}
-					if(Funcions.habilitarBotoPanell2(camp1,camp2,camp3,camp4,camp5)){
+					if(Controller.habilitarBotoPanell2(camp1,camp2,camp3,camp4,camp5)){
 						jbreserva.setEnabled(true);
 						panell2.add(jbreserva);
 					}
@@ -371,7 +381,7 @@ public class Finestra extends JFrame{
 					}
 				}
 				else if(e.getComponent().getName().equalsIgnoreCase("jtnumnits")){
-					if(Funcions.regexNumNits(jtnumnits.getText())) {
+					if(Controller.regexNumNits(jtnumnits.getText())) {
 						icona5.setIcon(creariconasi());
 						camp5 = true;
 					}
@@ -379,7 +389,7 @@ public class Finestra extends JFrame{
 						icona5.setIcon(creariconano());
 						camp5 = false;
 					}
-					if(Funcions.habilitarBotoPanell2(camp1,camp2,camp3,camp4,camp5)){
+					if(Controller.habilitarBotoPanell2(camp1,camp2,camp3,camp4,camp5)){
 						jbreserva.setEnabled(true);
 						panell2.add(jbreserva);
 					}
@@ -411,33 +421,36 @@ public class Finestra extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
+				clientregistrat = true;
 				
-				if(Funcions.clientJaHaFetReserva(jtdni.getText(), hotel.getLlistaClient())){
+				
+				if(Controller.clientJaHaFetReserva(jtdni.getText(), c.getHotel().getLlistaClient())){
 					
 					Clients client = new Clients(jtdni.getText());
-					client = Funcions.agafarClientRegistrar(jtdni.getText(),hotel.getLlistaClient());
+					client = Controller.agafarClientRegistrar(jtdni.getText(),c.getHotel().getLlistaClient());					
 					Reserves reserva = new Reserves(client);
-					reserva.setNumeropersones(Integer.valueOf(jtnumpersones.getText()));					
-					reserva.setDataentrada(Funcions.dataEntradaJCalendar(jccalendari ));
-					hotel.afegirLlistaReservesPendents(reserva);
-					gestiotablemodel1.addRow(reserva.arrayReservaPendent());
-
+					reserva = Controller.afegirDadesReserva(jtnumpersones.getText(),Controller.pasarDateALocalDate(jccalendari), reserva, jtnumnits.getText());
+				
+					Controller.afegirReserva(client, reserva,clientregistrat, c.getHotel(), gestiotablemodel1);
+						
 					
+					
+										
 					
 				}
 				
 				else {
+					clientregistrat =false;;
 					
 					Clients client = new Clients(jtdni.getText());
 					client.setNom(jtnom.getText());
 					client.setCognoms(jtcognoms.getText());
-					hotel.afegirClientArraylist(client);
 					Reserves reserva = new Reserves(client);
-					reserva.setNumeropersones(Integer.valueOf(jtnumpersones.getText()));					
-					reserva.setDataentrada(Funcions.dataEntradaJCalendar(jccalendari ));
-					hotel.afegirLlistaReservesPendents(reserva);
-					gestiotablemodel1.addRow(reserva.arrayReservaPendent());
+					reserva = Controller.afegirDadesReserva(jtnumpersones.getText(),Controller.pasarDateALocalDate(jccalendari), reserva, jtnumnits.getText());
 					
+					
+					Controller.afegirReserva(client, reserva, clientregistrat, c.getHotel(), gestiotablemodel1);
+
 				}
 
 								
@@ -465,26 +478,6 @@ public class Finestra extends JFrame{
 		
 	}
 	
-	private ImageIcon creariconano() {
-		
-		ImageIcon imageIcon = new ImageIcon("./imatges/no.png"); 
-		Image image = imageIcon.getImage();
-		Image newimg = image.getScaledInstance(15,15,  java.awt.Image.SCALE_SMOOTH); 
-		imageIcon = new ImageIcon(newimg);
-		return imageIcon;
-		
-	}
-	
-	private ImageIcon creariconasi() {
-		
-		ImageIcon imageIcon = new ImageIcon("./imatges/yes.png"); 
-		Image image = imageIcon.getImage();
-		Image newimg = image.getScaledInstance(15,15,  java.awt.Image.SCALE_SMOOTH); 
-		imageIcon = new ImageIcon(newimg);
-		return imageIcon;
-		
-	}
-	
 
 	/*#######################################################################################################################################################*/
 	
@@ -508,7 +501,6 @@ public class Finestra extends JFrame{
 		panell3.add(jtfnomhotel);	
 		
 		jbnomhotel = new JButton("Guarda!");
-		jbnomhotel.setName("jbnomhotel");
 		jbnomhotel.setBounds(150, 120, 100 , 30);
 		panell3.add(jbnomhotel);
 		
@@ -526,7 +518,12 @@ public class Finestra extends JFrame{
 		
 		jtfnumhabitacionova = new JTextField();
 		jtfnumhabitacionova.setBounds(100, 216, 60, 20);
+		jtfnumhabitacionova.setName("novahabitacio");
 		panell3.add(jtfnumhabitacionova);
+		
+		icona1p3 = new JLabel();
+		icona1p3.setBounds(170, 216, 15, 15);
+		panell3.add(icona1p3);
 		
 		jlnumpersoneshabitacio= new JLabel();
 		jlnumpersoneshabitacio.setBounds(220, 220, 50, 13);
@@ -535,11 +532,17 @@ public class Finestra extends JFrame{
 		panell3.add(jlnumpersoneshabitacio);
 		
 		jtfnumpersoneshabitacio = new JTextField();
+		jtfnumpersoneshabitacio.setName("personeshabitacio");
 		jtfnumpersoneshabitacio.setBounds(290, 216, 60, 20);
 		panell3.add(jtfnumpersoneshabitacio);
 		
+		icona2p3 = new JLabel();
+		icona2p3.setBounds(355, 216, 15, 15);
+		panell3.add(icona2p3);
+		
 		jbnnumpersoneshabitacio = new JButton("Guarda!");
 		jbnnumpersoneshabitacio.setBounds(150, 270, 100 , 30);
+		jbnnumpersoneshabitacio.setEnabled(false);
 		panell3.add(jbnnumpersoneshabitacio);
 		
 		jlconsultareserva = new JLabel();
@@ -585,23 +588,160 @@ public class Finestra extends JFrame{
 
 	private void listenersFinestra3() {
 		
-		ActionListener listener = new ActionListener() {			
+		ActionListener listener1 = new ActionListener() {			
 
 			public void actionPerformed(ActionEvent e) {
 				
-					hotel.setNomhotel(jtfnomhotel.getText());
+					c.getHotel().setNomhotel(jtfnomhotel.getText());
 					setTitle(jtfnomhotel.getText());				
 			}
 		};
+		jbnomhotel.addActionListener(listener1);
+
 		
-		jbnomhotel.addActionListener(listener);
+		KeyListener keylistener1 = new KeyListener() {		
+
+			@Override
+			public void keyReleased(KeyEvent e) {	
+								
+			
+				if (e.getComponent().getName().equalsIgnoreCase("novahabitacio")){
+					if(Controller.regexNumeroHabitacio(jtfnumhabitacionova.getText())){					
+						icona1p3.setIcon(creariconasi());
+						panell3.add(icona1p3);
+						camp1p3 = true;
+					}					
+					else {						
+						icona1p3.setIcon(creariconano());
+						panell3.add(icona1p3);
+						camp1p3 = false;						
+					}					
+					if(Controller.habilitarBotoPanell3(camp1p3, camp2p3)){					
+						jbnnumpersoneshabitacio.setEnabled(true);
+						panell3.add(jbnnumpersoneshabitacio);						
+					}					
+					else {
+						jbnnumpersoneshabitacio.setEnabled(false);
+						panell3.add(jbnnumpersoneshabitacio);						
+					}
+				
+				}
+				
+				else if (e.getComponent().getName().equalsIgnoreCase("personeshabitacio")) {
+					if(Controller.regexNumPersones(jtfnumpersoneshabitacio.getText())){
+						icona2p3.setIcon((creariconasi()));
+						panell3.add(icona2p3);
+						camp2p3 = true;
+					}
+					else {						
+						icona2p3.setIcon(creariconano());
+						panell3.add(icona2p3);
+						camp2p3 = false;						
+					}
+					if(Controller.habilitarBotoPanell3(camp1p3, camp2p3)){					
+						jbnnumpersoneshabitacio.setEnabled(true);
+						panell3.add(jbnnumpersoneshabitacio);						
+					}					
+					else {
+						jbnnumpersoneshabitacio.setEnabled(false);
+						panell3.add(jbnnumpersoneshabitacio);						
+					}
+										
+				}
+				
+			}
+			
+			@Override
+			public void keyTyped(KeyEvent e) {				
+			}		
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+		};
+		
+		jtfnumhabitacionova.addKeyListener(keylistener1);	
+		jtfnumpersoneshabitacio.addKeyListener(keylistener1);
+		
+		ActionListener listener2 = new ActionListener( ) {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				if(Controller.checkSiHabitacioExist(c.getHotel(), jtfnumhabitacionova.getText())){
+					if(Controller.checkIfHabitacioEstaOcupada(jtfnumhabitacionova.getText(), c.getHotel())){
+						JOptionPane.showMessageDialog(null, "Aquesta habitació esta reservada o en ús, no pot ser modificada");
+	                 }
+					else {
+						
+						int opcio = JOptionPane.showConfirmDialog(null, "Aquesta habitació ja es troba registrada,"
+								+ " aquesta compta amb una capacitat de " + Controller.getCapacitatActual(jtfnumhabitacionova.getText(), c.getHotel())+ 
+								" vols cambiar-la a " + jtfnumpersoneshabitacio.getText()+" ?") ;
+						switch(opcio) {
+						
+						case 0:
+							Controller.afegirNovaCapacitatHabitacio(jtfnumpersoneshabitacio.getText(), jtfnumhabitacionova.getText(),c.getHotel());
+							icona1p3.setIcon(null);
+							icona2p3.setIcon(null);
+							jtfnumhabitacionova.setText(null);
+							jtfnumpersoneshabitacio.setText(null);
+							jbnnumpersoneshabitacio.setEnabled(false);
+							
+							break;
+						case 1:
+							icona1p3.setIcon(null);
+							icona2p3.setIcon(null);
+							jtfnumhabitacionova.setText(null);
+							jtfnumpersoneshabitacio.setText(null);
+							jbnnumpersoneshabitacio.setEnabled(false);
+							break;
+						case 2:
+							break;					
+						
+						}
+					}
+						
+				}
+				
+				else {
+					Controller.afegirHabitacióNova(jtfnumhabitacionova.getText(), jtfnumpersoneshabitacio.getText(), c.getHotel());
+					JOptionPane.showMessageDialog(null, "La habitació s'ha afegit correctament!");
+					icona1p3.setIcon(null);
+					icona2p3.setIcon(null);
+					jtfnumhabitacionova.setText(null);
+					jtfnumpersoneshabitacio.setText(null);
+					jbnnumpersoneshabitacio.setEnabled(false);
+				}
+					
+				}
+		};
+		
+		jbnnumpersoneshabitacio.addActionListener(listener2);
+
 		
 	}	
 	
 
 	
-
+	private ImageIcon creariconano() {
+		
+		ImageIcon imageIcon = new ImageIcon("./imatges/no.png"); 
+		Image image = imageIcon.getImage();
+		Image newimg = image.getScaledInstance(15,15,  java.awt.Image.SCALE_SMOOTH); 
+		imageIcon = new ImageIcon(newimg);
+		return imageIcon;
+		
+	}
+	
+	private ImageIcon creariconasi() {
+		
+		ImageIcon imageIcon = new ImageIcon("./imatges/yes.png"); 
+		Image image = imageIcon.getImage();
+		Image newimg = image.getScaledInstance(15,15,  java.awt.Image.SCALE_SMOOTH); 
+		imageIcon = new ImageIcon(newimg);
+		return imageIcon;
+		
+	}
+	
 	
 	
 }
-

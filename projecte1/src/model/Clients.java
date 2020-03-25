@@ -1,4 +1,4 @@
-package hotel.classes;
+package model;
 
 public class Clients{
 	

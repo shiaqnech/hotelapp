@@ -1,4 +1,4 @@
-package hotel.classes;
+package model;
 
 import java.util.ArrayList;
 
@@ -11,9 +11,8 @@ public class Hotels{
 	protected ArrayList<Reserves> llistaReservesConfirmades = new ArrayList<Reserves>();
 	
 	
-	public Hotels(String nomhotel) {
+	public Hotels() {
 		super();
-		this.nomhotel = nomhotel;
 	}
 
 
