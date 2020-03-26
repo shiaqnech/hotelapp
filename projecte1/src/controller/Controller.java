@@ -15,6 +15,7 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JCalendar;
 
+import hotel.Hotel;
 import model.*;
 
 public class Controller {
@@ -126,7 +127,7 @@ public class Controller {
 		return false;
 	}
 
-	public static Clients agafarClientRegistrar(String dni, ArrayList<Clients> arrayList) {
+	public static Clients agafarClientRegistrat(String dni, ArrayList<Clients> arrayList) {
 
 		for (Clients i : arrayList) {
 
@@ -154,7 +155,7 @@ public class Controller {
 
 	}
 
-	public static void posarHabitacions(Hotels hotel) {
+	public void posarHabitacions(Hotels hotel) {
 
 		Random r = new Random();
 		int numpersones;
@@ -304,17 +305,51 @@ public class Controller {
 		return reserva;
 	}
 
-	public static void afegirReserva(Clients client, Reserves reserva, boolean clientregistrat, Hotels hotel,
-			DefaultTableModel gestiotablemodel1) {
-		if (clientregistrat = true) {
-			hotel.afegirLlistaReservesPendents(reserva);
-			gestiotablemodel1.addRow(reserva.arrayReservaPendent());
-		} else if (clientregistrat = false) {
-			hotel.afegirClientArraylist(client);
-			hotel.afegirLlistaReservesPendents(reserva);
-			gestiotablemodel1.addRow(reserva.arrayReservaPendent());
-		}
+	public static boolean crearClientIFerReserva(Hotels hotel, String dni, String nom, String cognoms,
+			LocalDate data, String numnits, String numpersones, DefaultTableModel gestiotablemodel1) {
+		
+	Clients client = new Clients();
+	client.setDni(dni);	
+	client.setNom(nom);
+	client.setCognoms(cognoms);
+	hotel.afegirClientArraylist(client);
+	
+	Reserves reserva = new Reserves(client);
+	reserva.setDataentrada(data);
+	reserva.setSortida(data.plusDays(Integer.parseInt(numnits)));
+	reserva.setNumeropersones(Integer.parseInt(numpersones));
+	
+	if (hotel.checkHabitacioLliureIAfegeix(reserva)) {
+		hotel.afegirLlistaReservesPendents(reserva);
+		gestiotablemodel1.addRow(reserva.arrayReservaPendent());
+		return true;	
+	}
+	
+	return false;
+	
+	
+	}
 
+	
+
+	public static boolean agafarClientCrearReserva(Hotels hotel, String dni, LocalDate data, String numnits,
+			String numpersones, DefaultTableModel gestiotablemodel1) {
+		
+		Clients client = agafarClientRegistrat(dni, hotel.getLlistaClient());
+		
+		Reserves reserva = new Reserves(client);
+		reserva.setDataentrada(data);
+		reserva.setSortida(data.plusDays(Integer.parseInt(numnits)));
+		reserva.setNumeropersones(Integer.parseInt(numpersones));
+		
+		if (hotel.checkHabitacioLliureIAfegeix(reserva)) {
+			hotel.afegirLlistaReservesPendents(reserva);
+			gestiotablemodel1.addRow(reserva.arrayReservaPendent());
+			return true;	
+		}
+		
+		return false;
+		
 	}
 
 

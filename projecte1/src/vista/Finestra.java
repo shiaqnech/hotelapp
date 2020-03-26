@@ -72,7 +72,6 @@ public class Finestra extends JFrame{
 		
 		posarPanells();
 		muntarFinestra();
-		Controller.posarHabitacions(c.getHotel());
 	
 	}
 
@@ -419,38 +418,29 @@ public class Finestra extends JFrame{
 		ActionListener listenerboto = new ActionListener() {
 			
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				clientregistrat = true;
-				
+			public void actionPerformed(ActionEvent e) {				
 				
 				if(Controller.clientJaHaFetReserva(jtdni.getText(), c.getHotel().getLlistaClient())){
 					
-					Clients client = new Clients(jtdni.getText());
-					client = Controller.agafarClientRegistrar(jtdni.getText(),c.getHotel().getLlistaClient());					
-					Reserves reserva = new Reserves(client);
-					reserva = Controller.afegirDadesReserva(jtnumpersones.getText(),Controller.pasarDateALocalDate(jccalendari), reserva, jtnumnits.getText());
-				
-					Controller.afegirReserva(client, reserva,clientregistrat, c.getHotel(), gestiotablemodel1);
-						
-					
-					
-										
+					if(Controller.agafarClientCrearReserva(c.getHotel(), jtdni.getText(), Controller.pasarDateALocalDate(jccalendari), jtnumnits.getText(), jtnumpersones.getText(), gestiotablemodel1)){
+						JOptionPane.showMessageDialog(null, "Afegit correctament a reserves pendents");
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "No hi ha una habitació disponible per aquest quantitat de persones");						
+					}
 					
 				}
 				
 				else {
-					clientregistrat =false;;
-					
-					Clients client = new Clients(jtdni.getText());
-					client.setNom(jtnom.getText());
-					client.setCognoms(jtcognoms.getText());
-					Reserves reserva = new Reserves(client);
-					reserva = Controller.afegirDadesReserva(jtnumpersones.getText(),Controller.pasarDateALocalDate(jccalendari), reserva, jtnumnits.getText());
-					
-					
-					Controller.afegirReserva(client, reserva, clientregistrat, c.getHotel(), gestiotablemodel1);
+					if(Controller.crearClientIFerReserva(c.getHotel(), jtdni.getText(), jtnom.getText(),
+							jtcognoms.getText(), Controller.pasarDateALocalDate(jccalendari), jtnumnits.getText(),jtnumpersones.getText(), gestiotablemodel1)) {
+						JOptionPane.showMessageDialog(null, "Afegit correctament a reserves pendents");
 
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "No hi ha una habitació disponible per aquest quantitat de persones");						
+					}
+					
 				}
 
 								

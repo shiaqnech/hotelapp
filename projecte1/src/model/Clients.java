@@ -4,9 +4,8 @@ public class Clients{
 	
 	protected String dni, nom, cognoms;
 
-	public Clients(String dni) {
+	public Clients() {
 		super();
-		this.dni = dni;
 	}
 
 	public String getDni() {

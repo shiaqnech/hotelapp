@@ -83,6 +83,28 @@ public class Hotels{
 	public void afegirLlistaHabitacions(Habitacions habitacio){
 		this.llistaHabitacions.add(habitacio);	
 	}
+
+
+	public  boolean checkHabitacioLliureIAfegeix(Reserves reserva) {
+		
+		for (int i = 0; i < 2; i++) {
+			
+			for (Habitacions x: this.llistaHabitacions) {
+				
+				if(x.getCapacitat() == reserva.getNumeropersones()+i) {
+					
+					if(reserva.mirarHabitacions(this, x)){
+						return true;
+					}
+				}
+				
+			}
+			
+		}		
+		return false;
+	}
+	
+
 	
 	
 	

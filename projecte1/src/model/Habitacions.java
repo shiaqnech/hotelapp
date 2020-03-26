@@ -31,9 +31,6 @@ public class Habitacions{
 	public void setNovaCapacitat(int novacapacitat) {
 		this.capacitat = novacapacitat;
 	}
-
-	
-	
 	
 	
 }
