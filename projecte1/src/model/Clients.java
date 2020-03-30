@@ -32,6 +32,11 @@ public class Clients{
 		this.cognoms = cognoms;
 	}
 	
+@Override
+public String toString() {
+	return this.nom.substring(0,1)+". "+this.getCognoms()+" - "+this.getDni();		
+}
+	
 	
 	
 

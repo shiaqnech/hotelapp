@@ -6,8 +6,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -20,9 +25,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+
+import org.junit.internal.runners.statements.RunAfters;
 
 import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
@@ -43,11 +53,14 @@ public class Finestra extends JFrame{
 
     JCalendar jccalendari;
     JButton jbreserva, jbnomhotel, jbnnumpersoneshabitacio, jbconsultareservaclient;
+    JToggleButton jtbentradasortida;
     JDateChooser jdcescollir;
     DefaultTableModel gestiotablemodel1,gestiotablemodel2;
     JTable taula1, taula2;    
-    DefaultListModel<String> llistamodel1, llistamodel2;
-    JList<String> jlconsultareservaclient2,jlconsultareservaclient1 ;
+    DefaultListModel<Clients> llistamodel1;
+    DefaultListModel<Reserves> llistamodel2;
+    JList<Clients>jlconsultareservaclient1 ;
+    JList<Reserves> jlconsultareservaclient2;
     JScrollPane taulascroll1, taulascroll2, llistrascroll1, llistrascroll2;
     
     Controller c = new Controller();    
@@ -72,6 +85,7 @@ public class Finestra extends JFrame{
 		
 		posarPanells();
 		muntarFinestra();
+//		c.posarHabitacions(c.getHotel());
 	
 	}
 
@@ -146,6 +160,7 @@ public class Finestra extends JFrame{
 		gestiotablemodel1.addColumn("Habitació");
         taula1 = new JTable(gestiotablemodel1);
         taula1.setBounds(15,140,360,235);
+        taula1.setDefaultEditor(Object.class, null);
         panell1.add(taula1);
         taulascroll1 = new JScrollPane(taula1,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         taulascroll1.setBounds(15,140,360,200);
@@ -154,12 +169,19 @@ public class Finestra extends JFrame{
         
 		//Reserves
 		jlreservesconfirmades = new JLabel();
-		jlreservesconfirmades.setBounds(15, 390, 170, 16);
+		jlreservesconfirmades.setBounds(15, 360, 170, 16);
 		jlreservesconfirmades.setFont(new Font("Arial", Font.PLAIN, 16));
 		jlreservesconfirmades.setText("Reserves confirmades");
 		panell1.add(jlreservesconfirmades);
 		
+		jtbentradasortida = new JToggleButton("Entrada");
+		jtbentradasortida.setBounds(15, 385, 120, 26);
+		panell1.add(jtbentradasortida);
+		
+		
+		
 		jdcescollir = new JDateChooser();
+		jdcescollir.setDate(Calendar.getInstance().getTime());
 		jdcescollir.setBounds(250, 385, 120, 26);
 		panell1.add(jdcescollir);		
 		
@@ -170,14 +192,96 @@ public class Finestra extends JFrame{
 		gestiotablemodel2.addColumn("Date out");
 		gestiotablemodel2.addColumn("Habitació");
         taula2 = new JTable(gestiotablemodel2);
+        taula2.setDefaultEditor(Object.class, null);
         taula2.setBounds(15,420,360,235);
         panell1.add(taula2);
          taulascroll2 = new JScrollPane(taula2,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         taulascroll2.setBounds(15,420,360,200);
         panell1.add(taulascroll2);
+        
+        listenerFinestra1();
+        
+     
 		
 	}
 	
+	private void listenerFinestra1() {
+		
+		MouseListener listenertaula1 = new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub				
+			}			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub				
+			}			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub				
+			}			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub			
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+				if(e.getClickCount() > 1) {
+					int filaseleccionada = taula1.getSelectedRow();				
+					if(filaseleccionada >= 0){
+						String[] opcions = new String[]{"Confirmar-la","Descarta-la","Cancelar" };
+						int opcio = JOptionPane.showOptionDialog(null, "Què vols fer amb aquesta reserva", "Confirmació", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, opcions, opcions[0]);
+						
+						switch (opcio) {
+						case 0:
+							c.passarDades(filaseleccionada,taula1, gestiotablemodel2, gestiotablemodel1);
+							c.actualitzaTaulaDeReservesConfirmades(jtbentradasortida, Controller.pasarDateALocalDate(jdcescollir.getDate()),gestiotablemodel2);
+							break;
+						case 1:
+							c.eliminarLinia(filaseleccionada, gestiotablemodel1);
+							break;							
+						case 2:
+							break;
+						}
+					}					
+				}				
+			}
+
+		};
+	
+		taula1.addMouseListener(listenertaula1);
+		
+		ActionListener listenertoglebutton = new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(jtbentradasortida.isSelected()){
+					jtbentradasortida.setText("Sortida");
+					c.actualitzaTaulaDeReservesConfirmades(jtbentradasortida, Controller.pasarDateALocalDate(jdcescollir.getDate()),gestiotablemodel2);					
+
+				}
+				else {
+					jtbentradasortida.setText("Entrada");
+					c.actualitzaTaulaDeReservesConfirmades(jtbentradasortida, Controller.pasarDateALocalDate(jdcescollir.getDate()),gestiotablemodel2);					
+				}
+			}
+		};
+		
+		jtbentradasortida.addActionListener(listenertoglebutton);
+		
+		PropertyChangeListener datechooser = new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent evt) {
+				c.actualitzaTaulaDeReservesConfirmades(jtbentradasortida, Controller.pasarDateALocalDate(jdcescollir.getDate()),gestiotablemodel2);					
+				System.out.println("hola");
+			}
+		};
+		jdcescollir.addPropertyChangeListener(datechooser);
+		
+		
+	}
+
 	/*#######################################################################################################################################################*/
 
 	
@@ -291,6 +395,8 @@ public class Finestra extends JFrame{
 		panell2.add(jbreserva);
 				
 		listenersFinestra2();
+		
+		
 		
 	}
 
@@ -421,8 +527,9 @@ public class Finestra extends JFrame{
 			public void actionPerformed(ActionEvent e) {				
 				
 				if(Controller.clientJaHaFetReserva(jtdni.getText(), c.getHotel().getLlistaClient())){
-					
-					if(Controller.agafarClientCrearReserva(c.getHotel(), jtdni.getText(), Controller.pasarDateALocalDate(jccalendari), jtnumnits.getText(), jtnumpersones.getText(), gestiotablemodel1)){
+					System.out.println("ig1");					
+					if(Controller.agafarClientCrearReserva(c.getHotel(), jtdni.getText(), Controller.pasarDateALocalDate(jccalendari.getDate()), jtnumnits.getText(), jtnumpersones.getText(), gestiotablemodel1)){
+						System.out.println();
 						JOptionPane.showMessageDialog(null, "Afegit correctament a reserves pendents");
 					}
 					else {
@@ -430,10 +537,10 @@ public class Finestra extends JFrame{
 					}
 					
 				}
-				
 				else {
+					System.out.println("2");
 					if(Controller.crearClientIFerReserva(c.getHotel(), jtdni.getText(), jtnom.getText(),
-							jtcognoms.getText(), Controller.pasarDateALocalDate(jccalendari), jtnumnits.getText(),jtnumpersones.getText(), gestiotablemodel1)) {
+							jtcognoms.getText(), Controller.pasarDateALocalDate(jccalendari.getDate()), jtnumnits.getText(),jtnumpersones.getText(), gestiotablemodel1)) {
 						JOptionPane.showMessageDialog(null, "Afegit correctament a reserves pendents");
 
 					}
@@ -456,8 +563,7 @@ public class Finestra extends JFrame{
 				icona4.setIcon(null);
 				icona5.setIcon(null);
 				
-				jccalendari = new JCalendar();
-				jccalendari.setBounds(30, 280, 330, 250);
+				jccalendari.setMinSelectableDate(Calendar.getInstance().getTime());
 				panell2.add(jccalendari);
 				
 				jbreserva.setEnabled(false);
@@ -551,8 +657,8 @@ public class Finestra extends JFrame{
 		jtfreservanomclient.setBounds(160, 366, 200, 20);
 		panell3.add(jtfreservanomclient);
 		
-        llistamodel1 = new DefaultListModel<String>();
-        jlconsultareservaclient1 = new JList<String>(llistamodel1);
+        llistamodel1 = new DefaultListModel<Clients>();
+        jlconsultareservaclient1 = new JList<Clients>(llistamodel1);
         jlconsultareservaclient1.setBounds(30,410,150,150);
         panell3.add(jlconsultareservaclient1);
         llistrascroll1 = new JScrollPane(jlconsultareservaclient1,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -560,16 +666,17 @@ public class Finestra extends JFrame{
         panell3.add(llistrascroll1);
         
         
-        llistamodel2 = new DefaultListModel<String>();
-        jlconsultareservaclient2 = new JList<String>(llistamodel2);
+        llistamodel2 = new DefaultListModel<Reserves>();
+        jlconsultareservaclient2 = new JList<Reserves>(llistamodel2);
         jlconsultareservaclient1.setBounds(30,410,150,150);
         panell3.add(jlconsultareservaclient2);
         llistrascroll2 = new JScrollPane(jlconsultareservaclient2,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         llistrascroll2.setBounds(215,410,150,150);
         panell3.add(llistrascroll2);
         
-		jbconsultareservaclient = new JButton("Guarda!");
+		jbconsultareservaclient = new JButton("Elimina!");
 		jbconsultareservaclient.setBounds(150, 600, 100 , 30);
+		jbconsultareservaclient.setEnabled(false);
 		panell3.add(jbconsultareservaclient);
 		
 		listenersFinestra3();		
@@ -706,7 +813,74 @@ public class Finestra extends JFrame{
 		};
 		
 		jbnnumpersoneshabitacio.addActionListener(listener2);
+		
+		KeyListener listenerreservanomclient = new KeyListener() {
+			@Override
+			public void keyReleased(KeyEvent e) {
 
+				if(!jtfreservanomclient.getText().isBlank()){
+					c.actualitzaLaLlistadeClients(llistamodel1, jtfreservanomclient.getText());
+				}
+				else {
+					c.eliminarLlistaClient(llistamodel1, llistamodel2);				
+				}
+			}
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub				
+			}			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub				
+			}
+		};
+		
+		jtfreservanomclient.addKeyListener(listenerreservanomclient);
+		
+		ListSelectionListener jlmostrarbooking  = new ListSelectionListener() {			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {				
+				if(e.getValueIsAdjusting()){
+					c.actualitzarLlistaDelClient(jlconsultareservaclient1.getSelectedValue(), llistamodel2);					
+				}
+			}
+		};
+		
+		jlconsultareservaclient1.addListSelectionListener(jlmostrarbooking);	
+		
+		ListSelectionListener jlbookingborrar = new ListSelectionListener() {			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (jlconsultareservaclient2.isSelectionEmpty()){					
+					jbconsultareservaclient.setEnabled(false);
+				}
+				else {
+					jbconsultareservaclient.setEnabled(true);	
+ 				}
+			}
+		};		
+		jlconsultareservaclient2.addListSelectionListener(jlbookingborrar);
+		
+		ActionListener jbconsultareservalistener = new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String[] opcions = new String[]{"Si","No"};
+				int opcio = JOptionPane.showOptionDialog(null, "Vols eliminar aquest reserva?", "Confirmació", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, opcions, opcions[0]);
+				switch (opcio) {
+				case 0:
+					c.eliminarReserva(jlconsultareservaclient2.getSelectedValue());
+					JOptionPane.showMessageDialog(null, "Reserva eliminada correctament.");
+					llistamodel2.clear();
+					c.actualitzarLlistaDelClient(jlconsultareservaclient1.getSelectedValue(), llistamodel2);
+					c.actualitzarLlistaReservesPendents(gestiotablemodel1);
+					break;
+				case 1:
+					break;
+				}				
+			}
+		};
+		
+		jbconsultareservaclient.addActionListener(jbconsultareservalistener);
 		
 	}	
 	

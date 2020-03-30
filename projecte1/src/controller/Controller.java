@@ -6,11 +6,18 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
+import java.util.logging.SimpleFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.imageio.stream.IIOByteBuffer;
+import javax.swing.DefaultListModel;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JCalendar;
@@ -142,9 +149,9 @@ public class Controller {
 
 	}
 
-	public static LocalDate pasarDateALocalDate(JCalendar jccalendari) {
+	public static LocalDate pasarDateALocalDate(Date date) {
 
-		Long dataNano = jccalendari.getDate().getTime();
+		Long dataNano = date.getTime();
 		LocalDate data = Instant.ofEpochMilli(dataNano).atZone(ZoneId.systemDefault()).toLocalDate();
 		return data;
 
@@ -162,7 +169,7 @@ public class Controller {
 
 		for (int i = 0; i < 50; i++) {
 
-			numpersones = r.nextInt(6 + 1);
+			numpersones = r.nextInt(6)+1;
 
 			Habitacions habitacio = new Habitacions(i + 1);
 			habitacio.setCapacitat(numpersones);
@@ -344,12 +351,98 @@ public class Controller {
 		
 		if (hotel.checkHabitacioLliureIAfegeix(reserva)) {
 			hotel.afegirLlistaReservesPendents(reserva);
-			gestiotablemodel1.addRow(reserva.arrayReservaPendent());
-			return true;	
+			actualitzarPendents(gestiotablemodel1, hotel);
+			return true;		
+		}
+		else {
+			return false;
+		}
+	}
+
+	private static  void actualitzarPendents(DefaultTableModel gestiotablemodel1, Hotels hotel) {
+		gestiotablemodel1.setRowCount(0);
+		if(hotel.getLlistaReservesPendents().size() > 0) {
+			for (Reserves i : hotel.getLlistaReservesPendents()) {
+				gestiotablemodel1.addRow(i.arrayReservaPendent());			
+			}			
+		}
+
+	}
+
+	public void passarDades(int filaseleccionada, JTable taula1, DefaultTableModel gestiotablemodel2, DefaultTableModel gestiotablemodel1) {
+		Reserves reserva = hotel.getLlistaReservesPendents().get(filaseleccionada);
+		gestiotablemodel1.removeRow(filaseleccionada);
+		hotel.afegirLlistaReservesConfirmades(reserva);
+		hotel.getLlistaReservesPendents().remove(filaseleccionada);
+	}
+	public void eliminarLinia(int filaseleccionada, DefaultTableModel gestiotablemodel1) {
+		gestiotablemodel1.removeRow(filaseleccionada);		
+	}
+	public Object getTodayDate() {
+		
+		Date avui = new Date();
+		avui = Calendar.getInstance().getTime();
+		return avui;
+	}
+
+	public void actualitzaTaulaDeReservesConfirmades(JToggleButton jtbentradasortida,
+			LocalDate data, DefaultTableModel gestiotablemodel2) {
+		gestiotablemodel2.setRowCount(0);
+		
+			if (jtbentradasortida.isSelected()) {
+				
+				for (Reserves i : hotel.getLlistaReservesConfirmades()) {
+					if(i.getSortida().isEqual(data)){
+						gestiotablemodel2.addRow(i.arrayReservaReservats());					}
+				}
+				
+			}
+			else {
+				for (Reserves i : hotel.getLlistaReservesConfirmades()) {
+					if(i.getDataentrada().isEqual(data)){
+						gestiotablemodel2.addRow(i.arrayReservaReservats());
+					}
+				}				
+			}
+
+				
+		
+	}
+
+	public void actualitzaLaLlistadeClients(DefaultListModel<Clients> llistamodel1, String paraula) {
+		
+		if(hotel.getLlistaClientsPerPattern(paraula).size() > 0){
+			llistamodel1.clear();
+			for (Clients i : hotel.getLlistaClientsPerPattern(paraula)){
+				llistamodel1.addElement(i);				
+			}			
+		}
+
+
+	}
+
+	public void eliminarLlistaClient(DefaultListModel<Clients> llistamodel1, DefaultListModel<Reserves> llistamodel2) {
+		llistamodel1.clear();
+		llistamodel2.clear();
+	}
+
+	public void actualitzarLlistaDelClient(Clients clients, DefaultListModel<Reserves> llistamodel2) {
+		
+		if(hotel.getLlistaReservesPendentsConfirmades(clients).size() > 0) {
+			llistamodel2.clear();
+			for (Reserves i : hotel.getLlistaReservesPendentsConfirmades(clients)) {
+				llistamodel2.addElement(i);				
+			}
 		}
 		
-		return false;
-		
+	}
+
+	public void eliminarReserva(Reserves reserva) {
+		hotel.eliminarReserva(reserva);				
+	}
+
+	public void actualitzarLlistaReservesPendents(DefaultTableModel gestiotablemodel1) {
+		actualitzarPendents(gestiotablemodel1, hotel);
 	}
 
 

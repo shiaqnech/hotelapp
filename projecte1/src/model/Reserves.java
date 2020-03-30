@@ -62,6 +62,7 @@ public class Reserves{
 	}
 	
 	public String[] arrayReservaPendent() {
+		
         String[] array = new String[4];
         array[0]=this.dataentrada.getDayOfMonth()+"-"+this.dataentrada.getMonthValue()+"-"+this.dataentrada.getYear();
         array[1]=client.getDni();
@@ -69,6 +70,7 @@ public class Reserves{
         array[3]=this.getHabitacio().getNumhabitacio()+"";
         return array;
     }
+
 
 
 
@@ -111,6 +113,22 @@ public class Reserves{
 		
 		this.setHabitacio(x);	
 		return true;
+	}
+
+
+
+	public Object[] arrayReservaReservats() {
+        String[] array = new String[4];
+        array[0]=this.getClient().getNom();
+        array[1]=this.dataentrada.getDayOfMonth()+"-"+this.dataentrada.getMonthValue()+"-"+this.dataentrada.getYear();
+        array[2]=this.sortida.getDayOfMonth()+"-"+this.dataentrada.getMonthValue()+"-"+this.dataentrada.getYear();
+        array[3]=this.getHabitacio().getNumhabitacio()+"";
+        return array;
+	}
+	
+	@Override
+	public String toString() {
+		return this.sortida+" - "+this.numeropersones+" persones";
 	}
 	
 	
