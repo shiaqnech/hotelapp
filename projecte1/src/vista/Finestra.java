@@ -414,6 +414,8 @@ public class Finestra extends JFrame {
 					} else {
 						camp1 = false;
 						icona1.setIcon(creariconano());
+						icona2.setIcon(null);
+						icona3.setIcon(null);
 						jtnom.setEditable(true);
 						jtcognoms.setEditable(true);
 						jtnom.setText("");
@@ -649,7 +651,6 @@ public class Finestra extends JFrame {
 		llistamodel1 = new DefaultListModel<Clients>();
 		jlconsultareservaclient1 = new JList<Clients>(llistamodel1);
 		jlconsultareservaclient1.setBounds(30, 410, 150, 150);
-		jlconsultareservaclient1.setSelectedIndex(0);
 		panell3.add(jlconsultareservaclient1);
 		llistrascroll1 = new JScrollPane(jlconsultareservaclient1, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -659,7 +660,6 @@ public class Finestra extends JFrame {
 		llistamodel2 = new DefaultListModel<Reserves>();
 		jlconsultareservaclient2 = new JList<Reserves>(llistamodel2);
 		jlconsultareservaclient1.setBounds(30, 410, 150, 150);
-		jlconsultareservaclient2.setSelectedIndex(0);
 		panell3.add(jlconsultareservaclient2);
 		llistrascroll2 = new JScrollPane(jlconsultareservaclient2, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -833,6 +833,7 @@ public class Finestra extends JFrame {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting()) {
 					c.actualitzarLlistaDelClient(jlconsultareservaclient1.getSelectedValue(), llistamodel2);
+					jlconsultareservaclient1.setSelectedIndex(0);
 				}
 			}
 		};

@@ -433,8 +433,7 @@ public class Controller {
 			for (Reserves i : hotel.getLlistaReservesPendentsConfirmades(clients)) {
 				llistamodel2.addElement(i);				
 			}
-		}
-		
+		}						
 	}
 
 	public void eliminarReserva(Reserves reserva) {
