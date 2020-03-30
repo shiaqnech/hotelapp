@@ -873,6 +873,7 @@ public class Finestra extends JFrame{
 					llistamodel2.clear();
 					c.actualitzarLlistaDelClient(jlconsultareservaclient1.getSelectedValue(), llistamodel2);
 					c.actualitzarLlistaReservesPendents(gestiotablemodel1);
+					c.actualitzaTaulaDeReservesConfirmades(jtbentradasortida, Controller.pasarDateALocalDate(jdcescollir.getDate()), gestiotablemodel2);
 					break;
 				case 1:
 					break;
