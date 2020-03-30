@@ -445,6 +445,17 @@ public class Controller {
 		actualitzarPendents(gestiotablemodel1, hotel);
 	}
 
+	public void autoCompletarCamps(JTextField jtdni, JTextField jtnom, JTextField jtcognoms, Hotels hotels) {
+		Clients client = new Clients();
+		client = agafarClientRegistrat(jtdni.getText(),hotels.getLlistaClient());
+		
+		jtnom.setText(client.getNom());
+		jtcognoms.setText(client.getCognoms());
+		jtnom.setEditable(false);
+		jtcognoms.setEditable(false);
+		
+	}
+
 
 
 }
