@@ -28,9 +28,11 @@ import model.*;
 public class Controller {
 
 	private Hotels hotel;
+	private Fitxers fitxer;
 
 	public Controller() {
 		hotel = new Hotels();
+		fitxer = new Fitxers();
 	}
 
 	public Hotels getHotel() {
@@ -134,7 +136,7 @@ public class Controller {
 		return false;
 	}
 
-	public static Clients agafarClientRegistrat(String dni, ArrayList<Clients> arrayList) {
+	public Clients agafarClientRegistrat(String dni, ArrayList<Clients> arrayList) {
 
 		for (Clients i : arrayList) {
 
@@ -219,13 +221,13 @@ public class Controller {
 		return false;
 	}
 
-	public static void afegirHabitacióNova(String numero, String quantitat, Hotels hotel) {
+	public void afegirHabitacioNova(String numero, String quantitat, Hotels hotel) {
 
 		Habitacions nova = new Habitacions(Integer.parseInt(numero));
 		nova.setCapacitat(Integer.parseInt(quantitat));
-
 		hotel.afegirLlistaHabitacions(nova);
-
+		fitxer.writeOnFileHabitacio(nova);
+		
 	}
 
 	public static boolean checkIfHabitacioEstaOcupada(String habitacio, Hotels hotel) {
@@ -272,11 +274,12 @@ public class Controller {
 		return null;
 	}
 
-	public static void afegirNovaCapacitatHabitacio(String quantiat, String num, Hotels hotel) {
+	public  void afegirNovaCapacitatHabitacio(String quantiat, String num, Hotels hotel) {
 
 		for (Habitacions i : hotel.getLlistaHabitacions()) {
 			if (i.getNumhabitacio() == Integer.parseInt(num)) {
 				i.setNovaCapacitat(Integer.parseInt(quantiat));
+				fitxer.actualitzarHabitacions(i, quantiat);
 			}
 		}
 
@@ -312,7 +315,7 @@ public class Controller {
 		return reserva;
 	}
 
-	public static boolean crearClientIFerReserva(Hotels hotel, String dni, String nom, String cognoms,
+	public boolean crearClientIFerReserva(Hotels hotel, String dni, String nom, String cognoms,
 			LocalDate data, String numnits, String numpersones, DefaultTableModel gestiotablemodel1) {
 		
 	Clients client = new Clients();
@@ -320,6 +323,7 @@ public class Controller {
 	client.setNom(nom);
 	client.setCognoms(cognoms);
 	hotel.afegirClientArraylist(client);
+	fitxer.writeOnFileClients(client);
 	
 	Reserves reserva = new Reserves(client);
 	reserva.setDataentrada(data);
@@ -339,7 +343,7 @@ public class Controller {
 
 	
 
-	public static boolean agafarClientCrearReserva(Hotels hotel, String dni, LocalDate data, String numnits,
+	public boolean agafarClientCrearReserva(Hotels hotel, String dni, LocalDate data, String numnits,
 			String numpersones, DefaultTableModel gestiotablemodel1) {
 		
 		Clients client = agafarClientRegistrat(dni, hotel.getLlistaClient());
@@ -351,6 +355,7 @@ public class Controller {
 		
 		if (hotel.checkHabitacioLliureIAfegeix(reserva)) {
 			hotel.afegirLlistaReservesPendents(reserva);
+			fitxer.writeOnFileReservesPendents(reserva);			
 			actualitzarPendents(gestiotablemodel1, hotel);
 			return true;		
 		}
@@ -372,11 +377,16 @@ public class Controller {
 	public void passarDades(int filaseleccionada, JTable taula1, DefaultTableModel gestiotablemodel2, DefaultTableModel gestiotablemodel1) {
 		Reserves reserva = hotel.getLlistaReservesPendents().get(filaseleccionada);
 		gestiotablemodel1.removeRow(filaseleccionada);
-		hotel.afegirLlistaReservesConfirmades(reserva);
-		hotel.getLlistaReservesPendents().remove(filaseleccionada);
+		fitxer.esborrarReservaPendentAfegirAComfirmada(reserva, hotel.getLlistaReservesConfirmades());
+		fitxer.writeOnFileReservesComfirmades(reserva);
+		hotel.getLlistaReservesPendents().remove(reserva);
 	}
 	public void eliminarLinia(int filaseleccionada, DefaultTableModel gestiotablemodel1) {
-		gestiotablemodel1.removeRow(filaseleccionada);		
+		Reserves reserva = hotel.getLlistaReservesPendents().get(filaseleccionada);
+		fitxer.esborrarReservaPendent(reserva);
+		hotel.getLlistaReservesPendents().remove(reserva);
+		gestiotablemodel1.removeRow(filaseleccionada);
+
 	}
 	public Object getTodayDate() {
 		
@@ -428,6 +438,7 @@ public class Controller {
 
 	public void actualitzarLlistaDelClient(Clients clients, DefaultListModel<Reserves> llistamodel2) {
 		
+		llistamodel2.clear();
 		if(hotel.getLlistaReservesPendentsConfirmades(clients).size() > 0) {
 			llistamodel2.clear();
 			for (Reserves i : hotel.getLlistaReservesPendentsConfirmades(clients)) {
@@ -437,10 +448,12 @@ public class Controller {
 	}
 
 	public void eliminarReserva(Reserves reserva) {
-		hotel.eliminarReserva(reserva);				
+		hotel.eliminarReserva(reserva);
+		fitxer.esborrarReservaConfirmada(reserva);
+		fitxer.esborrarReservaPendent(reserva);
 	}
 
-	public void actualitzarLlistaReservesPendents(DefaultTableModel gestiotablemodel1) {
+	public void actualitzarLlistaReservesPendents (DefaultTableModel gestiotablemodel1) {
 		actualitzarPendents(gestiotablemodel1, hotel);
 	}
 
@@ -454,7 +467,16 @@ public class Controller {
 		jtcognoms.setEditable(false);
 		
 	}
+	
+	public void omplirArrayList(){
+		fitxer.omplirAlHabitacions(hotel.getLlistaHabitacions());
+		fitxer.omplirAlClient(hotel.getLlistaClient());
+		fitxer.omplirAlReservesPendents(hotel.getLlistaClient(), hotel.getLlistaHabitacions(), hotel.getLlistaReservesPendents());
+		fitxer.omplirAlReservesComfirmades(hotel.getLlistaClient(), hotel.getLlistaHabitacions(), hotel.getLlistaReservesConfirmades());
+	}
+	
 
 
 
+	
 }

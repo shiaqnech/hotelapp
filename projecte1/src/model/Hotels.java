@@ -165,7 +165,7 @@ public class Hotels {
 		}
 		
 		if(borrarconfirmada){
-			llistaReservesConfirmades.remove(reserva);			
+			llistaReservesConfirmades.remove(reserva);
 		}
 		else if(borrarpendent){
 			llistaReservesPendents.remove(reserva);	

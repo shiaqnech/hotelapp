@@ -15,7 +15,6 @@ public class Reserves{
 		this.client = client;
 	}
 	
-	
 
 	public int getNumeropersones() {
 		return numeropersones;
